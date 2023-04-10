@@ -20,26 +20,33 @@ After following the instructions, how many lights are lit?
 */
 // https://kata-log.rocks/christmas-lights-kata
 
+import 'dart:math';
+
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('turn on 0,0 through 999,999 would turn on (or leave on) every light.', () {
     ChristmasLights christmasLights = ChristmasLights();
+    christmasLights.setRandomLights();
     christmasLights.instruction(Action.turnOn, [0, 0], [999, 999]);
-    expect(christmasLights.lightsCount(), 1000000);
+    expect(christmasLights.lightsCount([0, 0], [999, 999]), 1000000);
   });
   test(
       'toggle 0,0 through 999,0 would toggle the first line of 1000 lights, turning off the ones that were on, and turning on the ones that were off.',
       () {
     ChristmasLights christmasLights = ChristmasLights();
+    christmasLights.setRandomLights();
+    final initialLightsOnCoordinates = christmasLights.lightsCount([0, 0], [999, 0]);
     christmasLights.instruction(Action.toggle, [0, 0], [999, 0]);
-    expect(christmasLights.lightsCount(), 1000);
+    expect(christmasLights.lightsCount([0, 0], [999, 0]), (1000 - initialLightsOnCoordinates));
   });
 
   test('turn off 499,499 through 500,500 would turn off (or leave off) the middle four lights.', () {
     ChristmasLights christmasLights = ChristmasLights();
+    christmasLights.setRandomLights();
+    christmasLights.instruction(Action.turnOff, [0, 0], [999, 999]);
     christmasLights.instruction(Action.turnOn, [499, 499], [500, 500]);
-    expect(christmasLights.lightsCount(), 4);
+    expect(christmasLights.lightsCount([0, 0], [999, 999]), 4);
   });
 
   test('Prueba', () {
@@ -48,11 +55,12 @@ void main() {
     christmasLights.instruction(Action.toggle, [0, 0], [999, 0]);
     christmasLights.instruction(Action.turnOff, [499, 499], [500, 500]);
 
-    expect(christmasLights.lightsCount(), 1000000 - 1000 - 4);
+    expect(christmasLights.lightsCount([0, 0], [999, 999]), 1000000 - 1000 - 4);
   });
 
   test('Count lights', () {
     ChristmasLights christmasLights = ChristmasLights();
+    christmasLights.instruction(Action.turnOff, [0, 0], [999, 999]);
     christmasLights.instruction(Action.turnOn, [887, 9], [959, 629]);
     christmasLights.instruction(Action.turnOn, [454, 398], [844, 448]);
     christmasLights.instruction(Action.turnOff, [539, 243], [559, 965]);
@@ -63,7 +71,7 @@ void main() {
     christmasLights.instruction(Action.toggle, [720, 196], [897, 994]);
     christmasLights.instruction(Action.toggle, [831, 394], [904, 860]);
 
-    expect(christmasLights.lightsCount(), 230022);
+    expect(christmasLights.lightsCount([0, 0], [999, 999]), 230022);
   });
 }
 
@@ -86,15 +94,24 @@ class ChristmasLights {
     }
   }
 
-  int lightsCount() {
+  int lightsCount(List<int> start, List<int> end) {
     var lightsCount = 0;
-    for (var i = 0; i < 1000; i++) {
-      for (var j = 0; j < 1000; j++) {
+    for (var i = start[0]; i <= end[0]; i++) {
+      for (var j = start[1]; j <= end[1]; j++) {
         if (lights[i][j]) {
           lightsCount++;
         }
       }
     }
+    print('Luces encendidas: $lightsCount');
     return lightsCount;
+  }
+
+  void setRandomLights() {
+    for (var i = 0; i < 1000; i++) {
+      for (var j = 0; j < 1000; j++) {
+        lights[i][j] = Random().nextBool();
+      }
+    }
   }
 }
