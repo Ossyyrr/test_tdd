@@ -4,7 +4,7 @@ Because your neighbors keep defeating you in the holiday house decorating contes
 
 Examples
 turn on 0,0 through 999,999 would turn on (or leave on) every light.
-toggle 0,0 through 999,0 would toggle the first line of 1000 lights, turning off the ones that were on, and turning on the ones that were off.
+toggle 0,0 through 999,0 would toggle the first instruction of 1000 lights, turning off the ones that were on, and turning on the ones that were off.
 turn off 499,499 through 500,500 would turn off (or leave off) the middle four lights.
 Instructions
 turn on 887,9 through 959,629
@@ -18,57 +18,83 @@ toggle 720,196 through 897,994
 toggle 831,394 through 904,860
 After following the instructions, how many lights are lit?
 */
+// https://kata-log.rocks/christmas-lights-kata
 
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('turn on 0,0 through 999,999 would turn on (or leave on) every light.', () {
+    ChristmasLights christmasLights = ChristmasLights();
+    christmasLights.instruction(Action.turnOn, [0, 0], [999, 999]);
+    expect(christmasLights.lightsCount(), 1000000);
+  });
+  test(
+      'toggle 0,0 through 999,0 would toggle the first line of 1000 lights, turning off the ones that were on, and turning on the ones that were off.',
+      () {
+    ChristmasLights christmasLights = ChristmasLights();
+    christmasLights.instruction(Action.toggle, [0, 0], [999, 0]);
+    expect(christmasLights.lightsCount(), 1000);
+  });
+
+  test('turn off 499,499 through 500,500 would turn off (or leave off) the middle four lights.', () {
+    ChristmasLights christmasLights = ChristmasLights();
+    christmasLights.instruction(Action.turnOn, [499, 499], [500, 500]);
+    expect(christmasLights.lightsCount(), 4);
+  });
+
+  test('Prueba', () {
+    ChristmasLights christmasLights = ChristmasLights();
+    christmasLights.instruction(Action.turnOn, [0, 0], [999, 999]);
+    christmasLights.instruction(Action.toggle, [0, 0], [999, 0]);
+    christmasLights.instruction(Action.turnOff, [499, 499], [500, 500]);
+
+    expect(christmasLights.lightsCount(), 1000000 - 1000 - 4);
+  });
+
   test('Count lights', () {
-    var lights = List.generate(1000, (_) => List.filled(1000, false));
+    ChristmasLights christmasLights = ChristmasLights();
+    christmasLights.instruction(Action.turnOn, [887, 9], [959, 629]);
+    christmasLights.instruction(Action.turnOn, [454, 398], [844, 448]);
+    christmasLights.instruction(Action.turnOff, [539, 243], [559, 965]);
+    christmasLights.instruction(Action.turnOff, [370, 819], [676, 868]);
+    christmasLights.instruction(Action.turnOff, [145, 40], [370, 997]);
+    christmasLights.instruction(Action.turnOff, [301, 3], [808, 453]);
+    christmasLights.instruction(Action.turnOn, [351, 678], [951, 908]);
+    christmasLights.instruction(Action.toggle, [720, 196], [897, 994]);
+    christmasLights.instruction(Action.toggle, [831, 394], [904, 860]);
 
-    final List<String> lines = [
-      'turn_on 499,499 through 500,500',
-      // 'turn_on 887,9 through 959,629',
-      // 'turn_on 454,398 through 844,448',
-      // 'turn_off 539,243 through 559,965',
-      // 'turn_off 370,819 through 676,868',
-      // 'turn_off 145,40 through 370,997',
-      // 'turn_off 301,3 through 808,453',
-      // 'turn_on 351,678 through 951,908',
-      // 'toggle 720,196 through 897,994',
-      // 'toggle 831,394 through 904,860'
-    ];
-
-    for (var line in lines) {
-      final parts = line.split(' ');
-
-      final action = parts[0];
-      final start = parts[1].split(',').map((s) => int.parse(s)).toList();
-      final end = parts[3].split(',').map((s) => int.parse(s)).toList();
-
-      for (var i = start[0]; i <= end[0]; i++) {
-        for (var j = start[1]; j <= end[1]; j++) {
-          if (action == 'toggle') {
-            lights[i][j] = !lights[i][j];
-          } else if (action == 'turn_on') {
-            lights[i][j] = true;
-          } else if (action == 'turn_off') {
-            lights[i][j] = false;
-          }
-        }
-      }
-    }
-
-    var litCount = 0;
-    for (var i = 0; i < 1000; i++) {
-      for (var j = 0; j < 1000; j++) {
-        if (lights[i][j]) {
-          litCount++;
-        }
-      }
-    }
-
-    expect(litCount, equals(4));
+    expect(christmasLights.lightsCount(), 230022);
   });
 }
 
-class ChristmasLights {}
+enum Action { turnOn, turnOff, toggle }
+
+class ChristmasLights {
+  List<List<bool>> lights = List.generate(1000, (_) => List.filled(1000, false));
+
+  void instruction(Action action, List<int> start, List<int> end) {
+    for (var i = start[0]; i <= end[0]; i++) {
+      for (var j = start[1]; j <= end[1]; j++) {
+        if (action == Action.toggle) {
+          lights[i][j] = !lights[i][j];
+        } else if (action == Action.turnOn) {
+          lights[i][j] = true;
+        } else if (action == Action.turnOff) {
+          lights[i][j] = false;
+        }
+      }
+    }
+  }
+
+  int lightsCount() {
+    var lightsCount = 0;
+    for (var i = 0; i < 1000; i++) {
+      for (var j = 0; j < 1000; j++) {
+        if (lights[i][j]) {
+          lightsCount++;
+        }
+      }
+    }
+    return lightsCount;
+  }
+}
