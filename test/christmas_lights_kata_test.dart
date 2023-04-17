@@ -54,7 +54,6 @@ void main() {
     christmasLights.instruction(Action.turnOn, [0, 0], [999, 999]);
     christmasLights.instruction(Action.toggle, [0, 0], [999, 0]);
     christmasLights.instruction(Action.turnOff, [499, 499], [500, 500]);
-
     expect(christmasLights.lightsCount([0, 0], [999, 999]), 1000000 - 1000 - 4);
   });
 
@@ -70,7 +69,6 @@ void main() {
     christmasLights.instruction(Action.turnOn, [351, 678], [951, 908]);
     christmasLights.instruction(Action.toggle, [720, 196], [897, 994]);
     christmasLights.instruction(Action.toggle, [831, 394], [904, 860]);
-
     expect(christmasLights.lightsCount([0, 0], [999, 999]), 230022);
   });
 }
